@@ -1,0 +1,39 @@
+name: Rust
+
+on: [ push, pull_request ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          target: thumbv6m-none-eabi
+          components: rustfmt, clippy
+          profile: minimal
+    - name: Install flip-link
+      run: cargo install flip-link
+    - name: Build winc-rs
+      working-directory: winc-rs
+      run: cargo build --verbose
+    - name: Build winc-rs with defmt
+      working-directory: winc-rs
+      env:
+        DEFMT_LOG: "trace"
+      run: cargo build --verbose --features defmt
+    - name: Run tests
+      working-directory: winc-rs
+      run: cargo test --verbose
+    - name: Build feather
+      working-directory: feather
+      run: cargo build --verbose --lib --bins --examples
+    - name: Build feather_async
+      working-directory: feather_async
+      run: cargo build --verbose --lib --bins --examples
