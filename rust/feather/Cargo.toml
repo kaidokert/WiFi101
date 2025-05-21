@@ -1,0 +1,86 @@
+[package]
+# TODO(1) fix `authors` and `name` if you didn't use `cargo-generate`
+authors = ["kaidokert <kaidokert@gmail.com>"]
+name = "feather"
+edition = "2021"
+version = "0.1.0"
+
+[lib]
+harness = false
+
+[dependencies]
+cortex-m = { version = "0.7.3", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7.0"
+defmt = "0.3"
+
+defmt-rtt = "0.4"
+panic-probe = { version = "0.3.0", features = ["print-defmt"] }
+
+feather_m0 = { version = "0.18" , features=["winc"]}
+embedded-hal = { version= "1", features = ["defmt-03"]}
+nb = { version = "1.0"}
+
+cortex-m-systick-countdown = "0.1.0"
+
+embedded-nal = "=0.9.0"
+wincwifi = { path = "../winc-rs", default-features = false, features=["defmt"] }
+demos = { path = "../demos", default-features = false, features=["defmt"] }
+ssd1306 = { version = "0.10", optional = true }
+
+[[example]]
+name = "iperf3_client"
+required-features = ["iperf3"]
+
+[[example]]
+name = "oled"
+required-features = ["oled"]
+
+[[example]]
+name = "telnet_shell"
+required-features = ["telnet"]
+
+[features]
+iperf3 = ["demos/iperf3"]
+oled = ["dep:ssd1306"]
+telnet = ["demos/telnet"]
+
+# cargo build/run
+[profile.dev]
+# lto = "off"
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+# opt-level = 0         # <-
+opt-level = 'z'         # <-
+overflow-checks = true  # <-
+# panic = "unwind"
+
+# cargo test
+[profile.test]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = 3           # <-
+overflow-checks = true  # <-
+
+# cargo build/run --release
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = 'z'            # <-
+overflow-checks = false  # <-
+
+# cargo test --release
+[profile.bench]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = 3            # <-
+overflow-checks = false  # <-

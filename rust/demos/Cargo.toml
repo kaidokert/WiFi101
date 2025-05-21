@@ -1,0 +1,38 @@
+[package]
+name = "demos"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+embedded-nal = "0.9"
+log = { version = "0.4", optional = true }
+defmt = { version = "0.3", optional = true }
+httparse = { version = "1.10", default-features = false }
+serde-json-core = { version = "0.6.0", default-features = false, optional = true, features=["heapless"] }
+heapless = { version = "0.8.0", default-features = false, optional = true }
+serde = { version = "1.0.218", default-features = false, optional = true, features=["derive"] }
+rand_core = { version = "0.9", default-features = false, optional = true }
+rand = { version = "0.9", optional = true }
+menu = { version = "0.6", optional = true }
+embedded-io = { version = "0.6", optional = true }
+
+[target.'cfg(not(target_os = "none"))'.dependencies]
+clap = { version = "4", features = ["derive"] }
+env_logger = "0.11"
+std-embedded-nal = "0.4"
+
+
+[[bin]]
+name = "demo-binary"
+path = "src/bin/main.rs"
+required-features = ["std"]
+
+
+[features]
+default = ["std","telnet"]
+std = ["log", "rand"]
+defmt = ["dep:defmt", "heapless/defmt-03"]
+iperf3 = ["dep:serde-json-core", "dep:heapless", "dep:serde", "dep:rand_core"]
+telnet = ["dep:menu", "dep:embedded-io"]
+rand_core = ["dep:rand_core"]
+rand = ["dep:rand"]

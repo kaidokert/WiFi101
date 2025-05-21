@@ -1,0 +1,76 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-added-large-files
+    -   id: check-merge-conflict
+    -   id: check-json
+    -   id: check-yaml
+    -   id: check-toml
+    -   id: mixed-line-ending
+        args: ["--fix=auto"]
+
+-   repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+    -   id: fmt
+        name: Fmt for winc-rs
+        args: ['--manifest-path=winc-rs/Cargo.toml', '--']
+    -   id: fmt
+        name: Fmt for feather
+        args: ['--manifest-path=feather/Cargo.toml', '--']
+    -   id: fmt
+        name: Fmt for demos
+        args: ['--manifest-path=demos/Cargo.toml', '--']
+
+-   repo: local
+    hooks:
+    - id: check_winc_rs
+      name: Run Cargo check for winc-rs
+      language: system
+      entry: cargo check --manifest-path=winc-rs/Cargo.toml
+      files: \.(rs|toml)$
+      pass_filenames: false
+    - id: check_feather
+      name: Run Cargo check for Feather
+      language: system
+      # Needs to run in the directory, to pick up .cargo/config.toml
+      entry: python -c 'import os,sys; os.environ["RUSTFLAGS"]="-D warnings"; os.chdir("feather"); sys.exit(os.system("cargo check --lib --bins --examples"))'
+      files: \.(rs|toml)$
+      pass_filenames: false
+    - id: check_feather_async
+      name: Run Cargo check for Feather Async code
+      language: system
+      # Needs to run in the directory, to pick up .cargo/config.toml
+      entry: python -c 'import os,sys; os.environ["RUSTFLAGS"]="-D warnings"; os.chdir("feather_async"); sys.exit(os.system("cargo check --lib --bins --examples"))'
+      files: \.(rs|toml)$
+      pass_filenames: false
+    - id: check_demos
+      name: Run cargo check for demos
+      language: system
+      entry: python -c 'import os, sys; os.environ["RUSTFLAGS"]="-D warnings"; sys.exit(os.system("cargo check --manifest-path=demos/Cargo.toml"))'
+      # entry: cargo check --manifest-path=demos/Cargo.toml
+      files: \.(rs|toml)$
+      pass_filenames: false
+    - id: clippy_winc_rs
+      name: Run clippy for winc-rs
+      language: system
+      entry: cargo clippy --manifest-path=winc-rs/Cargo.toml -- -D warnings
+      files: \.(rs|toml)$
+      pass_filenames: false

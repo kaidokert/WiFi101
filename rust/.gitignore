@@ -1,0 +1,10 @@
+winc-rs/target
+winc-rs/Cargo.lock
+target/
+Cargo.lock
+.env
+.vscode/settings.json
+feather/.vscode/settings.json
+nodefmt/
+winc-rs/tarpaulin-report.html
+.vscode/
